@@ -1,0 +1,87 @@
+1. Generate a new rails app in the terminal, called cars_app:
+
+rails new cars_app --database=postgresql
+
+2. This creates a new cars_app directory. Cd into that, then run the rails server by typing
+
+rails s
+
+and take a look at http://localhost:3000 in the browser. You’ll see a no database error.
+
+3. Create a new database by typing:
+
+rake db:create
+
+Go back to your browser and refresh. Should now give you the rails start page. Now go to http://localhost:3000/cars. A router error!
+
+4. In your text editor, open up config/routes.rb and add
+
+get ‘cars’, to: ‘cars#index'
+
+This says to go to the cars controller when a path ‘cars’ in a GET request and to invoke the index action. This solves the routing error.
+
+5. Now to create a Cars Controller. Create a new file:
+app/controllers/products_controller.rb
+and paste in this code:
+
+# Cars Controller class.
+ # All Controllers are subclasses of the ApplicationController
+ class CarsController < ApplicationController
+
+ # The index action. This will be invoked to view all the cars.
+ def index
+ end
+
+end
+
+Go back to the browser. Another error solved, another error arises. We’re missing a template.
+
+6. Create a template: touch app/views/cars/index.html.erb
+(.erb is a template language)
+This is where you will put whatever you want to view in the browser. Just type hello! for now. At this point, in your browser window you should see your message, hello! (No cars yet)
+
+7. Create a table in the database for your cars. In terminal,
+rails generate migration CreateProducts name description price:decimal
+
+rake db:migrate
+
+It should tell you that it made a table. Now to populate this empty table with our cars.
+
+8. Create a new file:
+
+touch app/models/products.rb
+
+And past this in: (*Note that car is singular!)
+
+class Car < ActiveRecord::Base
+end
+
+9. Nav to db/seeds.rb and paste in:
+
+1.upto(5) do |num|
+  Car.create(name: “Car_make#{num}", “Car_model#{num}”, “Car_year#{num}" )
+end
+
+Back to terminal:
+rake db:seed
+
+10. Go back to Cars Controller and put this in:
+
+class CarsController < ApplicationController
+  def index
+    @cars = Car.all
+  end
+end
+
+11. Go to app/views/cars/index.html.erb
+
+<h2>Cars</h2>
+  <ul>
+   <% @cars.each do |car| %>
+    <li><%= car.make %></li>
+   <li><%= car.model %></li>
+   <li><%= car.year %></li>
+<% end %>
+</ul>
+
+YAY! You made a cars app!
